@@ -44,3 +44,15 @@ assert.ok(!titres.some((t) => t.includes('Marque - Maison Verte » est rentable'
 
 console.log(`OK — ${r.constats.length} constats`);
 r.constats.forEach((c) => console.log(` [${c.gravite}] ${c.titre}`));
+
+// Une ligne « Total » placée dans une colonne non reconnue (ici le mois) ne doit pas être comptée.
+const avecTotal = [
+  ['Mois', 'Canal', 'Campagne', 'Dépense', 'Commandes'],
+  ['Août', 'SEA', 'A', 100, 10],
+  ['Sept.', 'SEA', 'A', 200, 20],
+  ['Total', '', '', 300, 30],
+];
+const rt = A.analyser(A.extraire(avecTotal, 0, A.detecterColonnes(avecTotal[0])));
+assert.strictEqual(rt.total.cout, 300);
+assert.strictEqual(rt.campagnes.length, 1);
+console.log('OK — ligne Total ignorée, mois additionnés');

@@ -148,7 +148,11 @@ const AuditExpress = (() => {
       const levier = String(lire(ligne, 'levier') ?? '').trim();
       const campagne = String(lire(ligne, 'campagne') ?? '').trim();
       // Les lignes « Total » des exports feraient compter les chiffres deux fois.
-      if (/^total/i.test(campagne) || /^total/i.test(levier)) continue;
+      // Le mot peut se trouver dans n'importe quelle colonne (par exemple celle du mois).
+      if (ligne.some((c) => typeof c === 'string' && /^\s*(total|sous-total|grand total)\b/i.test(c))) continue;
+      // Une ligne sans nom, alors que le fichier a des colonnes de noms, est aussi un récapitulatif.
+      const aDesNoms = correspondance.levier >= 0 || correspondance.campagne >= 0;
+      if (aDesNoms && !levier && !campagne) continue;
       const cout = lireNombre(lire(ligne, 'cout'));
       const conversions = lireNombre(lire(ligne, 'conversions'));
       if (Number.isNaN(cout) && Number.isNaN(conversions)) continue;
