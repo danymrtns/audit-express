@@ -1,0 +1,3 @@
+# Les cas réels contiennent des données de clients : ils restent sur cet ordinateur.
+cas/*
+!cas/LISEZMOI.md

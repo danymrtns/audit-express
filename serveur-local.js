@@ -10,6 +10,8 @@ const types = {
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.csv': 'text/csv; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.pdf': 'application/pdf',
 };
 
 http.createServer((req, res) => {
@@ -19,6 +21,7 @@ http.createServer((req, res) => {
   if (!chemin.startsWith(__dirname)) { res.writeHead(403).end(); return; }
   fs.readFile(chemin, (err, contenu) => {
     if (err) { res.writeHead(404).end('Introuvable'); return; }
-    res.writeHead(200, { 'Content-Type': types[path.extname(chemin)] || 'application/octet-stream' }).end(contenu);
+    // Pas de cache : un cas réécrit par Claude doit s'afficher tout de suite.
+    res.writeHead(200, { 'Content-Type': types[path.extname(chemin)] || 'application/octet-stream', 'Cache-Control': 'no-store' }).end(contenu);
   });
 }).listen(port, () => console.log(`http://localhost:${port}`));

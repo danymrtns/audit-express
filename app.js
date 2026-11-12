@@ -401,11 +401,15 @@ Règles :
       const zone = Object.assign(document.createElement('textarea'), { value: texte });
       document.body.append(zone); zone.select(); document.execCommand('copy'); zone.remove();
     }
+    copier.afficher(message);
+  }
+  /** Affiche un court message en bas de l'écran. */
+  copier.afficher = (message) => {
     const bulle = $('bulle');
     bulle.textContent = message; bulle.hidden = false;
     clearTimeout(copier.minuteur);
     copier.minuteur = setTimeout(() => { bulle.hidden = true; }, 2200);
-  }
+  };
 
   // ---------- Événements ----------
   $('fichier').addEventListener('change', (e) => { recevoir(e.target.files[0]); e.target.value = ''; });
@@ -437,6 +441,22 @@ Règles :
   depot.addEventListener('drop', (e) => recevoir(e.dataTransfer.files[0]));
   // Un fichier lâché à côté de la zone ne doit pas remplacer la page.
   ['dragover', 'drop'].forEach((ev) => window.addEventListener(ev, (e) => e.preventDefault()));
+
+  // ---------- Lien avec Claude, en local uniquement ----------
+  // La commande /audit-cas fait lire un PDF à Claude, qui écrit cas/<nom>.json puis ouvre
+  // cette page avec ?cas=<nom>. Le dossier cas/ n'est jamais publié : rien de tel en ligne.
+  const nomCas = new URLSearchParams(location.search).get('cas');
+  const enLocal = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  if (nomCas && enLocal && /^[\w-]+$/.test(nomCas)) {
+    fetch(`cas/${nomCas}.json`, { cache: 'no-store' })
+      .then((reponse) => (reponse.ok ? reponse.text() : Promise.reject(new Error('introuvable'))))
+      .then((texte) => {
+        const erreur = chargerTexte(texte, nomCas);
+        if (erreur) signalerErreur(erreur);
+        else copier.afficher('Cas préparé par Claude chargé');
+      })
+      .catch(() => signalerErreur(`Le cas « ${nomCas} » est introuvable dans le dossier cas/.`));
+  }
 
   // Accès pour les tests et le débogage.
   window.AuditExpressApp = { chargerTexte, synthese, briefIA, PROMPT_EXTRACTION };

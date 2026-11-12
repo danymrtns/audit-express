@@ -13,7 +13,7 @@ Dans un audit de compte, la première heure sert surtout à calculer : CPA, ROAS
 - **Vérifiable.** Les constats viennent de règles fixes et lisibles, pas d'une IA. Chaque chiffre affiché peut être recalculé à la main.
 - **Honnête sur ses limites.** Une donnée absente reste inconnue : elle n'est jamais remplacée par zéro ni inventée.
 
-## Deux façons de l'alimenter
+## Trois façons de l'alimenter
 
 ### 1. Un export Excel ou CSV
 
@@ -43,6 +43,19 @@ Un cas client mêle du texte (contexte, objectif, contraintes) et des chiffres d
 Un tableau copié depuis Excel peut aussi être collé directement au même endroit.
 
 Exemple fourni : [`exemples/cas-atelier-brume.pdf`](exemples/cas-atelier-brume.pdf) (le cas) et [`exemples/cas-atelier-brume.json`](exemples/cas-atelier-brume.json) (l'extraction attendue).
+
+### 3. En local, relié à Claude Code
+
+Sur un ordinateur où le dépôt est ouvert dans Claude Code, la commande **`/audit-cas`** enchaîne les deux étapes ci-dessus sans copier-coller. On dépose le document dans la conversation (ou dans le dossier `cas/`), et Claude :
+
+1. lit le document et écrit l'extraction dans `cas/cas-en-cours.json` ;
+2. contrôle l'extraction : nombre de lignes, totaux, lignes relues au hasard ;
+3. lance le moteur de calcul (`node analyser-cas.js`) et ouvre la page avec le diagnostic chargé (`http://localhost:4173/?cas=cas-en-cours`) ;
+4. rend compte de ce qui a été lu, des hypothèses et de ce qui manque — sans rédiger la recommandation à la place du consultant.
+
+Le partage des rôles ne change pas : Claude lit, l'outil calcule. Les instructions suivies par Claude sont dans [`.claude/skills/audit-cas/SKILL.md`](.claude/skills/audit-cas/SKILL.md).
+
+Ce mode n'existe qu'en local. Le dossier `cas/` est ignoré par Git : les données d'un client ne sont jamais envoyées sur GitHub, et la page en ligne ne peut charger aucun cas de cette façon.
 
 ## Faire avec ce qu'on a
 
@@ -114,7 +127,10 @@ Il faut relire l'extraction de l'IA avant de s'y fier : comparer deux ou trois c
 | `test.js` | Tests du moteur : `node test.js` |
 | `exemples/` | Jeux d'essai : export complet (CSV, Excel), cas incomplet (PDF, JSON) |
 | `construire-exemples.js` | Regroupe les exemples dans `exemples/exemples.js` pour les boutons de la page |
-| `serveur-local.js` | Serveur de test facultatif : `node serveur-local.js` |
+| `serveur-local.js` | Serveur local : `node serveur-local.js`, puis http://localhost:4173 |
+| `analyser-cas.js` | Le moteur en ligne de commande : `node analyser-cas.js cas/cas-en-cours.json` |
+| `.claude/skills/audit-cas/` | La commande `/audit-cas` pour Claude Code |
+| `cas/` | Documents et cas en cours, jamais publiés |
 | `vendor/xlsx.full.min.js` | [SheetJS](https://sheetjs.com) (licence Apache 2.0), pour lire les fichiers Excel |
 
 ## Comment il a été fait
