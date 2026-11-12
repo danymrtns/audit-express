@@ -10,7 +10,7 @@
   <header class="entete">
     <div>
       <h1>Audit Express</h1>
-      <p class="accroche">Déposez un export de campagnes : le diagnostic chiffré sort en quelques secondes.</p>
+      <p class="accroche">Un export de campagnes ou un cas client en PDF : le diagnostic chiffré sort en quelques secondes.</p>
     </div>
     <p class="confidentialite">Tout est calculé dans ce navigateur. Aucune donnée ne quitte cet ordinateur.</p>
   </header>
@@ -18,14 +18,36 @@
   <main>
     <section id="depot" class="depot" tabindex="0">
       <p><strong>Glissez un fichier Excel ou CSV ici</strong></p>
-      <p class="discret">Colonnes utiles : campagne, levier, impressions, clics, coût, conversions, chiffre d'affaires, part d'impressions.</p>
+      <p class="discret">L'outil s'adapte aux colonnes présentes : il recalcule ce qui peut l'être et signale ce qui manque.</p>
       <div class="boutons">
         <label class="bouton principal">Choisir un fichier
-          <input id="fichier" type="file" accept=".csv,.txt,.tsv,.xlsx,.xls" hidden>
+          <input id="fichier" type="file" accept=".csv,.txt,.tsv,.xlsx,.xls,.json,.pdf" hidden>
         </label>
-        <button id="exemple" class="bouton" type="button">Charger l'exemple</button>
+        <button id="ouvrirCas" class="bouton" type="button">Importer un cas (PDF, texte)</button>
+        <button id="exemple" class="bouton" type="button">Exemple : export complet</button>
+        <button id="exempleCas" class="bouton" type="button">Exemple : cas incomplet</button>
       </div>
       <p id="erreur" class="erreur" role="alert" hidden></p>
+    </section>
+
+    <section id="panneauCas" class="carte panneau-cas" hidden>
+      <h2>Importer un cas client</h2>
+      <p class="discret">Un cas en PDF mêle du texte et des chiffres. L'IA le lit et range les informations ; l'outil fait ensuite les calculs avec des règles fixes.</p>
+      <ol class="etapes">
+        <li>
+          <p><strong>Donnez le PDF à votre IA</strong> (Claude, Gemini, ChatGPT) avec ce prompt d'extraction.</p>
+          <button id="copierPrompt" class="bouton principal" type="button">Copier le prompt d'extraction</button>
+        </li>
+        <li>
+          <p><label for="collage"><strong>Collez sa réponse ici.</strong> Un tableau copié depuis Excel fonctionne aussi.</label></p>
+          <textarea id="collage" rows="6" spellcheck="false" placeholder='{ "client": "…", "donnees": [ … ] }'></textarea>
+          <div class="boutons gauche">
+            <button id="analyserCollage" class="bouton principal" type="button">Analyser</button>
+            <button id="fermerCas" class="bouton" type="button">Fermer</button>
+          </div>
+          <p id="erreurCas" class="erreur" role="alert" hidden></p>
+        </li>
+      </ol>
     </section>
 
     <details id="colonnes" class="carte" hidden>
@@ -35,6 +57,11 @@
     </details>
 
     <div id="resultat" hidden>
+      <section id="blocContexte" hidden>
+        <h2>Le cas</h2>
+        <div id="contexte" class="carte contexte"></div>
+      </section>
+
       <section>
         <div class="titre-section">
           <h2>Vue d'ensemble <span id="nomFichier" class="discret"></span></h2>
@@ -45,6 +72,12 @@
           </div>
         </div>
         <div id="tuiles" class="tuiles"></div>
+        <div class="carte reglages">
+          <label>Objectif de CPA (€)<input id="objectifCPA" type="number" min="0" step="any" inputmode="decimal"></label>
+          <label>Objectif de ROAS<input id="objectifROAS" type="number" min="0" step="any" inputmode="decimal"></label>
+          <label id="champPanier">Panier moyen supposé (€)<input id="panier" type="number" min="0" step="any" inputmode="decimal"></label>
+          <p class="discret">Facultatif. Les objectifs servent de référence à la place de la moyenne du compte. Le panier moyen sert à estimer la rentabilité quand le chiffre d'affaires manque.</p>
+        </div>
       </section>
 
       <section>
@@ -52,22 +85,33 @@
         <ol id="constats" class="constats"></ol>
       </section>
 
-      <section class="deux-colonnes">
-        <div class="carte">
+      <section id="blocLimites">
+        <h2>Ce que les données ne disent pas</h2>
+        <div id="limites" class="carte"></div>
+      </section>
+
+      <section id="blocGraphiques" class="deux-colonnes">
+        <div id="carteLeviers" class="carte">
           <h3>Part du budget et part des conversions, par levier</h3>
           <div id="graphLeviers"></div>
         </div>
-        <div class="carte">
+        <div id="carteCampagnes" class="carte">
           <h3 id="titreGraphCampagnes"></h3>
           <div id="graphCampagnes"></div>
         </div>
       </section>
 
       <section>
+        <div id="blocEvolution" hidden>
+          <h2>Par période</h2>
+          <div class="defilement"><table id="tableEvolution"></table></div>
+        </div>
         <h2>Par levier</h2>
         <div class="defilement"><table id="tableLeviers"></table></div>
-        <h2>Par campagne</h2>
-        <div class="defilement"><table id="tableCampagnes"></table></div>
+        <div id="blocCampagnes">
+          <h2>Par campagne</h2>
+          <div class="defilement"><table id="tableCampagnes"></table></div>
+        </div>
       </section>
     </div>
   </main>
@@ -78,6 +122,7 @@
   <div id="bulle" class="bulle" role="status" hidden></div>
 
   <script src="vendor/xlsx.full.min.js"></script>
+  <script src="exemples/exemples.js"></script>
   <script src="analyse.js"></script>
   <script src="app.js"></script>
 </body>

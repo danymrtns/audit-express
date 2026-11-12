@@ -132,3 +132,37 @@ td.bon { color: var(--bon); font-weight: 600; }
   body { background: #fff; }
   .constat, .carte, .tuile { break-inside: avoid; }
 }
+
+/* ---------- Import d'un cas, contexte, limites, réglages ---------- */
+.panneau-cas { margin-top: 16px; }
+.panneau-cas h2 { margin-top: 0; }
+.etapes { margin: 12px 0 0; padding-left: 22px; display: grid; gap: 16px; }
+.etapes p { margin: 0 0 8px; }
+textarea {
+  width: 100%; font: 0.85rem/1.4 ui-monospace, Consolas, monospace;
+  padding: 10px; border: 1px solid var(--bord); border-radius: 8px;
+  background: var(--fond); color: var(--texte); resize: vertical;
+}
+textarea:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.boutons.gauche { justify-content: flex-start; margin-top: 8px; }
+
+.contexte { display: grid; gap: 12px; }
+.contexte h3 { font-size: 1.15rem; margin: 0; }
+.contexte p { margin: 0; }
+.contexte .objectif { border-left: 4px solid var(--accent); padding-left: 12px; }
+.contexte .colonnes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px 24px; }
+.contexte h4, #limites h4 { margin: 0 0 4px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--discret); }
+.contexte ul, #limites ul { margin: 0; padding-left: 18px; }
+.contexte li, #limites li { margin-bottom: 4px; }
+
+.reglages { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 16px; margin-top: 12px; }
+.reglages label { display: grid; gap: 4px; font-size: 0.8rem; color: var(--discret); }
+.reglages input {
+  font: inherit; width: 150px; padding: 6px 8px;
+  border: 1px solid var(--bord); border-radius: 8px; background: var(--surface); color: var(--texte);
+}
+.reglages p { margin: 0; flex: 1 1 260px; }
+
+#limites { display: grid; gap: 16px; }
+#limites .question { color: var(--accent); }
+#limites li strong { font-weight: 600; }
