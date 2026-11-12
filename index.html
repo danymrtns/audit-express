@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audit Express</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="entete">
+    <div>
+      <h1>Audit Express</h1>
+      <p class="accroche">Déposez un export de campagnes : le diagnostic chiffré sort en quelques secondes.</p>
+    </div>
+    <p class="confidentialite">Tout est calculé dans ce navigateur. Aucune donnée ne quitte cet ordinateur.</p>
+  </header>
+
+  <main>
+    <section id="depot" class="depot" tabindex="0">
+      <p><strong>Glissez un fichier Excel ou CSV ici</strong></p>
+      <p class="discret">Colonnes utiles : campagne, levier, impressions, clics, coût, conversions, chiffre d'affaires, part d'impressions.</p>
+      <div class="boutons">
+        <label class="bouton principal">Choisir un fichier
+          <input id="fichier" type="file" accept=".csv,.txt,.tsv,.xlsx,.xls" hidden>
+        </label>
+        <button id="exemple" class="bouton" type="button">Charger l'exemple</button>
+      </div>
+      <p id="erreur" class="erreur" role="alert" hidden></p>
+    </section>
+
+    <details id="colonnes" class="carte" hidden>
+      <summary>Colonnes reconnues <span id="resumeColonnes" class="discret"></span></summary>
+      <p class="discret">Corrigez l'association si une colonne a été mal reconnue.</p>
+      <div id="choixColonnes" class="grille-colonnes"></div>
+    </details>
+
+    <div id="resultat" hidden>
+      <section>
+        <div class="titre-section">
+          <h2>Vue d'ensemble <span id="nomFichier" class="discret"></span></h2>
+          <div class="boutons">
+            <button id="copierSynthese" class="bouton" type="button">Copier la synthèse</button>
+            <button id="copierBrief" class="bouton" type="button">Copier le brief pour l'IA</button>
+            <button id="imprimer" class="bouton" type="button">Imprimer</button>
+          </div>
+        </div>
+        <div id="tuiles" class="tuiles"></div>
+      </section>
+
+      <section>
+        <h2>Constats et recommandations</h2>
+        <ol id="constats" class="constats"></ol>
+      </section>
+
+      <section class="deux-colonnes">
+        <div class="carte">
+          <h3>Part du budget et part des conversions, par levier</h3>
+          <div id="graphLeviers"></div>
+        </div>
+        <div class="carte">
+          <h3 id="titreGraphCampagnes"></h3>
+          <div id="graphCampagnes"></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Par levier</h2>
+        <div class="defilement"><table id="tableLeviers"></table></div>
+        <h2>Par campagne</h2>
+        <div class="defilement"><table id="tableCampagnes"></table></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="discret">
+    Les constats sont produits par des règles fixes et vérifiables, décrites dans le README. Ils servent de point de départ à l'analyse, pas de conclusion.
+  </footer>
+  <div id="bulle" class="bulle" role="status" hidden></div>
+
+  <script src="vendor/xlsx.full.min.js"></script>
+  <script src="analyse.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
